@@ -10,21 +10,6 @@ A Flask API for managing guest and booking records in a SQLite database, with en
 
 ## API Endpoints
 
-### Guests
-* **GET /guests**: Get all guests.
-* **POST /guests**: Add a new guest.
-  * **Body**:
-    ```json
-    { "first_name": "John", "last_name": "Doe", "country": "USA" }
-    ```
-* **GET /guests/<id>**: Get a guest by ID.
-* **PUT/PATCH /guests/<id>**: Update a guest.
-  * **Body**:
-    ```json
-    { "first_name": "Jane" }
-    ```
-* **DELETE /guests/<id>**: Delete a guest by ID.
-
 ### Bookings
 * **GET /bookings**: Get all bookings.
 * **POST /bookings**: Add a new booking.
