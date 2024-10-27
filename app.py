@@ -3,57 +3,67 @@ from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 
-@app.route("/guests", methods=['GET', 'POST'])
-def guests():
-    conn = sqlite3.connect('guests.db')
+@app.route("/rooms", methods=['GET', 'POST'])
+def rooms():
+    conn = sqlite3.connect('rooms.db')
     cursor = conn.cursor()
-
+    
+    # Get Room
     if request.method == 'GET':
-        cursor.execute('SELECT * FROM guests')
+        cursor.execute('SELECT * FROM rooms')
         result = cursor.fetchall()
 
         if not result:
             return jsonify([])
 
-        guests = []
+        rooms = []
 
         for row in result:
-            guest = {
+            room = {
                 "id": row[0],
-                "first_name": row[1],
-                "last_name": row[2],
-                "country": row[3]
-            }
-            guests.append(guest)
+                "days_rented": row[1],
+                "season": row[2],
+                "price": row[3],
+                "date": row[4],
+                "guest_id": row[5],
+                "room_type": row[6]
+                }
+            rooms.append(room)
 
         conn.close()
         
-        return jsonify(guests)
+        return jsonify(rooms)
     
     elif request.method == 'POST':
         data = request.get_json()
-        first_name = data.get('first_name')
-        last_name = data.get('last_name')
-        country = data.get('country')
+        days_rented = data.get('days_rented')
+        season = data.get('season')
+        price = data.get('price')
+        date = data.get('date')
+        guest_id = data.get('guest_id')
+        room_type = data.get('room_type')
 
-        cursor.execute('''
-            INSERT INTO guests (first_name, last_name, country)
-            VALUES (?, ?, ?)
-        ''', (first_name, last_name, country))
-        
         guest_id = cursor.lastrowid
+        cursor.execute('''
+            INSERT INTO rooms (days_rented , season, date,room_type)
+            VALUES (?, ?, ?, ?)
+        ''', (days_rented,  season, price, date,  room_type))
+        
+        room_id = cursor.lastrowid
 
         conn.commit()
         conn.close()
 
-        new_guest = {
-            "id": guest_id,
-            "first_name": first_name,
-            "last_name": last_name,
-            "country": country
+        new_room = {
+            "id": room_id,
+            "days_rented": days_rented,
+            "season": season,
+            "price": price,
+            "date": date,
+            "guest_id": guest_id,
+            "room_type": room_type
         }
-        
-        return jsonify(new_guest), 201
+        return jsonify(new_room ), 201
     
 
 @app.route("/guests/<int:id>", methods=['GET','DELETE', 'PUT', 'PATCH'])
