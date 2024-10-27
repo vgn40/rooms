@@ -5,17 +5,13 @@ app = Flask(__name__)
 
 @app.route("/bookings", methods=['GET', 'POST'])
 def bookings():
-    conn = sqlite3.connect('bookings.db')
+    conn = sqlite3.connect('guests.db')
     cursor = conn.cursor()
     
-    # Get Booking
+    # Get all Booking
     if request.method == 'GET':
         cursor.execute('SELECT * FROM bookings')
         result = cursor.fetchall()
-
-        if not result:
-            conn.close()
-            return jsonify([])
 
         bookings = []
 
@@ -55,7 +51,8 @@ def bookings():
 
         conn.commit()
         conn.close()
-
+        
+        # Return booking JSON message
         new_booking = {
             "id": booking_id,
             "days_rented": days_rented,
@@ -67,61 +64,71 @@ def bookings():
         }
         return jsonify(new_booking), 201
 
-@app.route("/guests/<int:id>", methods=['GET','DELETE', 'PUT', 'PATCH'])
-def guest(id):
+@app.route("/bookings/<int:id>", methods=['GET','DELETE', 'PUT', 'PATCH'])
+def booking(id):
     conn = sqlite3.connect('guests.db')
     cursor = conn.cursor()
 
+
     if request.method == 'GET':
-        cursor.execute('SELECT * FROM guests WHERE id = ?', (id,))
+        cursor.execute('SELECT * FROM bookings WHERE id = ?', (id,))
         result = cursor.fetchone()
 
         if result is None:
-            return jsonify({"error": "Guest not found"}), 404
+            conn.close()
+            return jsonify({"error": "Booking not found"}), 404
 
         
-        guest = {
+        booking = {
             "id": result[0],
-            "first_name": result[1],
-            "last_name": result[2],
-            "country": result[3]
+            "days_rented": result[1],
+            "season": result[2],
+            "price": result[3],
+            "date": result[4],
+            "guest_id": result[5],
+            "room_type": result[6]
         }
 
         conn.close()
         
-        return jsonify(guest)
+        return jsonify(booking)
     
     elif request.method == 'DELETE':
-        cursor.execute('DELETE FROM guests WHERE id = ?', (id,))
+        cursor.execute('DELETE FROM bookings WHERE id = ?', (id,))
         conn.commit()
-        conn.close()
-        
+
         if cursor.rowcount == 0:
-            return jsonify({"error": "Guest not found"}), 404
-        
+            conn.close()
+            return jsonify({"error": "Booking not found"}), 404
+        conn.close()
         return "", 204
 
     elif request.method in ['PUT', 'PATCH']:
         data = request.get_json()
-        first_name = data.get("first_name")
-        last_name = data.get("last_name")
-        country = data.get("country")
 
+        days_rented = data.get("days_rented")
+        season = data.get("season")
+        price = data.get("price")
+        date = data.get("date")
+        room_type = data.get("room_type")
+        
         cursor.execute('''
-            UPDATE guests 
-            SET first_name = COALESCE(?, first_name), 
-                last_name = COALESCE(?, last_name), 
-                country = COALESCE(?, country)
+            UPDATE bookings 
+            SET days_rented = COALESCE(?, days_rented), 
+                season = COALESCE(?, season), 
+                price = COALESCE(?, price), 
+                date = COALESCE(?, date), 
+                room_type = COALESCE(?, room_type)
             WHERE id = ?
-        ''', (first_name, last_name, country, id))
-
+        ''', (days_rented, season, price, date, room_type, id))
         conn.commit()
 
         if cursor.rowcount == 0:
-            return jsonify({"error": "Guest not found"}), 404
+            conn.close()
+            return jsonify({"error": "booking not found"}), 404
 
         conn.close()
-        return jsonify({"message": "Guest updated successfully"}), 200
+        return jsonify({"message": "booking updated successfully"}), 200
     
 
 if __name__ == "__main__":
