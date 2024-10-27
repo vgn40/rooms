@@ -3,24 +3,24 @@ from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 
-@app.route("/rooms", methods=['GET', 'POST'])
-def rooms():
-    conn = sqlite3.connect('rooms.db')
+@app.route("/bookings", methods=['GET', 'POST'])
+def bookings():
+    conn = sqlite3.connect('bookings.db')
     cursor = conn.cursor()
     
-    # Get Room
+    # Get Booking
     if request.method == 'GET':
-        cursor.execute('SELECT * FROM rooms')
+        cursor.execute('SELECT * FROM bookings')
         result = cursor.fetchall()
 
         if not result:
             conn.close()
             return jsonify([])
 
-        rooms = []
+        bookings = []
 
         for row in result:
-            room = {
+            booking = {
                 "id": row[0],
                 "days_rented": row[1],
                 "season": row[2],
@@ -28,11 +28,11 @@ def rooms():
                 "date": row[4],
                 "guest_id": row[5],
                 "room_type": row[6]
-                }
-            rooms.append(room)
+            }
+            bookings.append(booking)
         conn.close()
         
-        return jsonify(rooms)
+        return jsonify(bookings)
     
     elif request.method == 'POST':
         data = request.get_json()
@@ -43,22 +43,21 @@ def rooms():
         guest_id = data.get('guest_id')
         room_type = data.get('room_type')
 
-    if not all([days_rented, season, price, date, guest_id, room_type]):  
-        conn.close()
-        return jsonify({'error': 'Missing required fields'}), 400    
+        if not all([days_rented, season, price, date, guest_id, room_type]):  
+            conn.close()
+            return jsonify({'error': 'Missing required fields'}), 400    
         
-    cursor.execute('''
-            INSERT INTO rooms (days_rented , season, price, date, room_type, guest_id)
+        cursor.execute('''
+            INSERT INTO bookings (days_rented, season, price, date, guest_id, room_type)
             VALUES (?, ?, ?, ?, ?, ?)
-        ''', (days_rented,  season, price, date,  room_type, guest_id))
-    room_id = cursor.lastrowid    
-    
+        ''', (days_rented, season, price, date, guest_id, room_type))
+        booking_id = cursor.lastrowid    
 
-    conn.commit()
-    conn.close()
+        conn.commit()
+        conn.close()
 
-    new_room = {
-            "id": room_id,
+        new_booking = {
+            "id": booking_id,
             "days_rented": days_rented,
             "season": season,
             "price": price,
@@ -66,8 +65,7 @@ def rooms():
             "guest_id": guest_id,
             "room_type": room_type
         }
-    return jsonify(new_room ), 201
-    
+        return jsonify(new_booking), 201
 
 @app.route("/guests/<int:id>", methods=['GET','DELETE', 'PUT', 'PATCH'])
 def guest(id):
