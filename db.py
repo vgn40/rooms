@@ -14,6 +14,19 @@ def initialize_db():
         )
     ''')
     
+     # Create the bookings table if it doesn't exist
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS bookings (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            days_rented INTEGER NOT NULL,
+            season TEXT NOT NULL,
+            price REAL NOT NULL,
+            date TEXT NOT NULL,
+            guest_id INTEGER NOT NULL,
+            room_type TEXT NOT NULL,
+            FOREIGN KEY (guest_id) REFERENCES guests(id)
+        )
+    ''')
     conn.commit()
     conn.close()
     print("Database and table 'guests' initialized successfully.")
