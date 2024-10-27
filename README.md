@@ -1,5 +1,5 @@
 # Rooms API
-A Flask API for managing guest and booking records in a SQLite database, with endpoints for CRUD operations.
+A Flask API for managing booking records in a SQLite database, with endpoints for CRUD operations.
 
 ## Project Structure
 * `app.py`: Main API file.
@@ -9,7 +9,6 @@ A Flask API for managing guest and booking records in a SQLite database, with en
 * `requirements.txt`: Python dependencies.
 
 ## API Endpoints
-
 ### Bookings
 * **GET /bookings**: Get all bookings.
 * **POST /bookings**: Add a new booking.
