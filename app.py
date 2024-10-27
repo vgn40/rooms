@@ -14,6 +14,7 @@ def rooms():
         result = cursor.fetchall()
 
         if not result:
+            conn.close()
             return jsonify([])
 
         rooms = []
@@ -29,7 +30,6 @@ def rooms():
                 "room_type": row[6]
                 }
             rooms.append(room)
-
         conn.close()
         
         return jsonify(rooms)
@@ -43,18 +43,21 @@ def rooms():
         guest_id = data.get('guest_id')
         room_type = data.get('room_type')
 
-        guest_id = cursor.lastrowid
-        cursor.execute('''
-            INSERT INTO rooms (days_rented , season, date,room_type)
-            VALUES (?, ?, ?, ?)
-        ''', (days_rented,  season, price, date,  room_type))
-        
-        room_id = cursor.lastrowid
-
-        conn.commit()
+    if not all([days_rented, season, price, date, guest_id, room_type]):  
         conn.close()
+        return jsonify({'error': 'Missing required fields'}), 400    
+        
+    cursor.execute('''
+            INSERT INTO rooms (days_rented , season, price, date, room_type, guest_id)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ''', (days_rented,  season, price, date,  room_type, guest_id))
+    room_id = cursor.lastrowid    
+    
 
-        new_room = {
+    conn.commit()
+    conn.close()
+
+    new_room = {
             "id": room_id,
             "days_rented": days_rented,
             "season": season,
@@ -63,7 +66,7 @@ def rooms():
             "guest_id": guest_id,
             "room_type": room_type
         }
-        return jsonify(new_room ), 201
+    return jsonify(new_room ), 201
     
 
 @app.route("/guests/<int:id>", methods=['GET','DELETE', 'PUT', 'PATCH'])
