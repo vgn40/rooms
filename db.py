@@ -2,18 +2,11 @@ import sqlite3
 import csv
 
 def initialize_db():
-    conn = sqlite3.connect('guests.db')
+    conn = sqlite3.connect('bookings.db')
     cursor = conn.cursor()
     
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS guests (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            first_name TEXT NOT NULL,
-            last_name TEXT NOT NULL,
-            country TEXT NOT NULL
-        )
-    ''')
-    
+    cursor.execute('DROP TABLE IF EXISTS guests')
+
      # Create the bookings table if it doesn't exist
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS bookings (
@@ -29,26 +22,25 @@ def initialize_db():
     ''')
     conn.commit()
     conn.close()
-    print("Database and table 'guests' initialized successfully.")
+    print("Database and table 'booking' initialized successfully.")
 
 
 def populate_db():
-    conn = sqlite3.connect('guests.db')
+    conn = sqlite3.connect('bookings.db')
     cursor = conn.cursor()
 
-    with open("international_names_with_rooms_1000.csv", mode='r', newline='', encoding='utf-8') as file:
-        csv_reader = csv.DictReader(file, delimiter=',')
-        for row in csv_reader:
-            cursor.execute('''
-                INSERT INTO guests (first_name, last_name, country)
-                VALUES (?, ?, ?)
-            ''', (row['First Name'], row['Family Name'], row['Country']))
-
-    conn.commit()
-    conn.close()
-    print("Database populated successfully from CSV file.")
+#   with open("international_names_with_rooms_1000.csv", mode='r', newline='', encoding='utf-8') as file:
+#        csv_reader = csv.DictReader(file, delimiter=',')
+#        for row in csv_reader:
+#            cursor.execute('''
+#    INSERT INTO bookings (days_rented, season, price, date, guest_id, room_type)
+#    VALUES (?, ?, ?, ?, ?, ?)
+#''', (row['days_rented'], row['season'], row['price'], row['date'], row['guest_id'], row['room_type']))
+#    conn.commit()
+#    conn.close()
+#    print("Database populated successfully from CSV file.")
 
 
 if __name__ == "__main__":
     initialize_db()
-    populate_db()
+ 

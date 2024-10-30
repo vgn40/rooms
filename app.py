@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 @app.route("/bookings", methods=['GET', 'POST'])
 def bookings():
-    conn = sqlite3.connect('guests.db')
+    conn = sqlite3.connect('bookings.db')
     cursor = conn.cursor()
     
     # Get all Booking
@@ -66,7 +66,7 @@ def bookings():
 
 @app.route("/bookings/<int:id>", methods=['GET','DELETE', 'PUT', 'PATCH'])
 def booking(id):
-    conn = sqlite3.connect('guests.db')
+    conn = sqlite3.connect('bookings.db')
     cursor = conn.cursor()
 
 
