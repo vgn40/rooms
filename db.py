@@ -25,9 +25,9 @@ def initialize_db():
     print("Database and table 'booking' initialized successfully.")
 
 
-def populate_db():
-    conn = sqlite3.connect('bookings.db')
-    cursor = conn.cursor()
+#def populate_db():
+#    conn = sqlite3.connect('bookings.db')
+#    cursor = conn.cursor()
 
 #   with open("international_names_with_rooms_1000.csv", mode='r', newline='', encoding='utf-8') as file:
 #        csv_reader = csv.DictReader(file, delimiter=',')
